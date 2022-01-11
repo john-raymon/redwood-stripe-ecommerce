@@ -1,0 +1,38 @@
+/**
+ * START --- SETUP TAILWINDCSS EDIT
+ *
+ * `yarn rw setup ui tailwindcss` placed these imports here
+ * to inject Tailwind's styles into your CSS.
+ * For more information, see: https://tailwindcss.com/docs/installation#include-tailwind-in-your-css
+ */
+@font-face {
+  font-family: 'VCR';
+  src: url('/public/VCROSDMono.woff2') format('woff2'),
+      url('/public/VCROSDMono.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+* {
+  @apply font-[VCR];
+}
+
+body {
+  font-family: lato, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-smooth: always;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body, html {
+  @apply bg-[#EFEEEA];
+}
+
+/**
+ * END --- SETUP TAILWINDCSS EDIT
+ */
