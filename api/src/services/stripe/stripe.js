@@ -11,3 +11,15 @@ export const fetchStripeProducts = async () => {
     return { success: false, error }
   }
 }
+
+export const fetchPricesForProduct = async (productId = '') => {
+  try {
+    const { data = [] } = await stripeClient.prices.list({
+      product: productId,
+    })
+    return { success: true, prices: data }
+  } catch (error) {
+    logger.error('fetchPricesForProduct', error)
+    return { success: false, error }
+  }
+}

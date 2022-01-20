@@ -1,5 +1,8 @@
 import { logger } from 'src/lib/logger'
-import { fetchStripeProducts } from 'src/services/stripe/stripe'
+import {
+  fetchStripeProducts,
+  fetchPricesForProduct,
+} from 'src/services/stripe/stripe'
 
 /**
  * The handler function is your code that processes http request events.
@@ -25,10 +28,23 @@ export const handler = async () => {
   }
   try {
     const response = await fetchStripeProducts()
-    return {
-      statusCode,
-      header,
-      body: JSON.stringify(response),
+    if (response && response.products && response.products.length) {
+      const getProductsWithPrices = () => {
+        return Promise.all(
+          response.products.map((product) => {
+            return fetchPricesForProduct(product.id).then(({ prices = [] }) => {
+              return { prices, product }
+            })
+          })
+        )
+      }
+      return getProductsWithPrices().then((products) => {
+        return {
+          statusCode,
+          header,
+          body: JSON.stringify({ success: true, products }),
+        }
+      })
     }
   } catch (error) {
     statusCode = 500
