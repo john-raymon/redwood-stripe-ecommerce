@@ -55,8 +55,13 @@ const HomePage = () => {
                   {product.name}&nbsp;-&nbsp;
                   {selectedProductPrices[product.id] ? (
                     `$${
-                      pricesById[selectedProductPrices[product.id]].unit_amount
-                    }`
+                      pricesById[selectedProductPrices[product.id]]
+                        .unit_amount &&
+                      (
+                        pricesById[selectedProductPrices[product.id]]
+                          .unit_amount / 100
+                      ).toFixed(2)
+                    } USD`
                   ) : (
                     <span className="opacity-[0.7]">
                       (Select a size to view price)
