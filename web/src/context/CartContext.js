@@ -1,6 +1,27 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 
 const CartContext = React.createContext()
+
+const CART_STORAGE_KEY = 'JOHNRAYMON_MERCH_CART'
+
+function getStorageCartState() {
+  const data = window.localStorage.getItem(CART_STORAGE_KEY)
+  if (data) {
+    return JSON.parse(data)
+  }
+  return undefined
+}
+
+function setStorageCartState(value) {
+  try {
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(value))
+  } catch (error) {
+    console.log(
+      'Error while attempting to persist cart state in local storage',
+      error
+    )
+  }
+}
 
 const defaultCartState = {
   products: {},
@@ -14,6 +35,16 @@ export const useCartContext = () => {
 export const CartProvider = ({ children }) => {
   const [cartState, setCart] = useState(defaultCartState)
 
+  useEffect(() => {
+    const storageCartState = getStorageCartState()
+    if (storageCartState) {
+      setCart(storageCartState)
+    }
+  }, [])
+
+  useEffect(() => {
+    setStorageCartState(cartState)
+  }, [cartState])
   /**
    *
    * @param {*} productData an object with the product object, price object that's being added to the cart
