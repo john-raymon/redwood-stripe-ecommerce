@@ -1,4 +1,5 @@
 import { logger } from 'src/lib/logger'
+import { validate } from '@redwoodjs/api'
 
 const stripeClient = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
@@ -22,4 +23,17 @@ export const fetchPricesForProduct = async (productId = '') => {
     logger.error('fetchPricesForProduct', error)
     return { success: false, error }
   }
+}
+
+export const createCheckoutSession = async (lineItems) => {
+  validate(lineItems, 'List of items', {
+    presence: true,
+  })
+  const session = await stripeClient.checkout.sessions.create({
+    success_url: 'https://example.com/success',
+    cancel_url: 'https://example.com/cancel',
+    line_items: lineItems,
+    mode: 'payment',
+  })
+  return session
 }

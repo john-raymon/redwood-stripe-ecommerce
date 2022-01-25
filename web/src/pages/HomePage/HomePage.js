@@ -54,7 +54,6 @@ const HomePage = () => {
       price: pricesById[selectedPrice],
     }
     addToCart(cartItem, 1)
-    // TODO: Add logic to add item to cart
   }
 
   return (

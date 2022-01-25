@@ -53,6 +53,38 @@ export const CartProvider = ({ children }) => {
     })
   }
 
+  function checkout() {
+    const lineItems = Object.entries(cartState.products).map(
+      ([priceId, { quantity }]) => ({ price: priceId, quantity })
+    )
+
+    fetch(`${window.RWJS_API_URL}/createCheckoutSession`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        lineItems,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Sorry we're having trouble taking you to checkout")
+        }
+        return response.json()
+      })
+      .then((response) => {
+        if (response.checkoutSession) {
+          return (window.location.href = response.checkoutSession.url)
+        } else {
+          throw new Error("Sorry we're having trouble taking you to checkout")
+        }
+      })
+      .catch(() => {
+        alert("Sorry we're having trouble taking you to checkout")
+      })
+  }
+
   const totalQuantity = Object.values(cartState.products).reduce(
     (acc, { quantity }) => {
       return acc + quantity
@@ -64,6 +96,7 @@ export const CartProvider = ({ children }) => {
     cart: cartState,
     addToCart,
     totalQuantity,
+    checkout,
   }
 
   return <CartContext.Provider value={cart}>{children}</CartContext.Provider>
