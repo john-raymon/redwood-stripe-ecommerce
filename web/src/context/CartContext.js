@@ -45,6 +45,19 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     setStorageCartState(cartState)
   }, [cartState])
+
+  function removeCartItem(id) {
+    setCart((prevState) => {
+      delete prevState.products[id]
+      return {
+        ...prevState,
+        products: {
+          ...prevState.products,
+        },
+      }
+    })
+  }
+
   /**
    *
    * @param {*} productData an object with the product object, price object that's being added to the cart
@@ -55,15 +68,14 @@ export const CartProvider = ({ children }) => {
     const { price, product } = productData
     setCart((prevState) => {
       // products are listed by their price variants id, not the product ids
-      if (prevState.products[price.id]) {
-        const cartItem = prevState.products[price.id]
+      const cartItem = prevState.products[price.id]
+      if (cartItem) {
         return {
           ...prevState,
           products: {
             ...prevState.products,
             [price.id]: {
-              product,
-              price,
+              ...cartItem,
               quantity: newQuantity || cartItem.quantity + quantityIncrement,
             },
           },
@@ -88,6 +100,10 @@ export const CartProvider = ({ children }) => {
     const lineItems = Object.entries(cartState.products).map(
       ([priceId, { quantity }]) => ({ price: priceId, quantity })
     )
+
+    if (!lineItems.length) {
+      return false
+    }
 
     fetch(`${window.RWJS_API_URL}/createCheckoutSession`, {
       method: 'POST',
@@ -118,7 +134,7 @@ export const CartProvider = ({ children }) => {
 
   const totalQuantity = Object.values(cartState.products).reduce(
     (acc, { quantity }) => {
-      return acc + quantity
+      return +acc + +quantity
     },
     0
   )
@@ -128,6 +144,7 @@ export const CartProvider = ({ children }) => {
     addToCart,
     totalQuantity,
     checkout,
+    removeCartItem,
   }
 
   return <CartContext.Provider value={cart}>{children}</CartContext.Provider>
